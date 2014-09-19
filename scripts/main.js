@@ -9,10 +9,6 @@ recognition.onresult = function(event) {
     parse(event.results[0][0].transcript);
 }
 
-recognition.onend = function (event) {
-	recognition.start();
-}
-
 document.getElementById('microphone-button').addEventListener('click', function(event) {
 	recognition.start();
 });
