@@ -1,0 +1,10 @@
+{
+	"strict": true,
+	"curly": true,
+	"eqeqeq": true,
+	"indent": 4,
+	"latedef": true,
+	"quotmark": "single",
+	"strict": true,
+	"jquery": true
+}

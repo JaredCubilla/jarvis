@@ -1,0 +1,1 @@
+function parse(a){"use strict";console.log(a)}var recognition=new webkitSpeechRecognition;recognition.onresult=function(a){"use strict";$("#test").html('You just said "'+a.results[0][0].transcript+'"'),parse(a.results[0][0].transcript)},document.getElementById("microphone-button").addEventListener("click",function(){"use strict";recognition.start()});
