@@ -6,9 +6,7 @@ var confidence = 0;
 // Removing commas, periods, punctuation, making it lowercase.
 function parse(str) {
 	'use strict';
-	str.toLowerCase();
-	str.replace(/r/g, '');
-	return str;
+	
 }
 
 console.log(recognition);
@@ -21,17 +19,20 @@ recognition.onstart = function(event) {
 // On result event.
 recognition.onresult = function(event) {
 	'use strict';
-	window.result = parse(event.results[0][0].transcript);
+	var sound = new Howl({
+		urls: ['http://pause-geek.fr/audio/temp/whatislove.ogg']
+	}).play();
+	window.result = event.results[0][0].transcript.toLowerCase().replace(/,/g, '');
 	window.confidence = event.results[0][0].confidence;
 
-	if (window.confidence > 0.75) {
-		$('#test').html('You just said "' + event.results[0][0].transcript + '"');
+	if (window.confidence > 0.6) {
+		$('#test').html(result);
 	}
 };
 
 recognition.onend = function(event) {
 	'use strict';
-	if (!window.result || window.confidence < 0.75) {
+	if (!window.result || window.confidence < 0.6) {
 		console.log('Could you repeat that? Confidence: ' + window.confidence);
 		recognition.start();
 	}
