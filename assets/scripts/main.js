@@ -90,6 +90,12 @@ function parse(str) {
 			window.open(endpoint + query);
 
 			break;
+
+		case 'goodbye':
+		case 'bye':
+			responses = ['See ya soon.', 'Goodbye!', 'I\'ll miss you! Bye!'];
+			window.close();
+			break;
 	}
 }
 
@@ -116,6 +122,7 @@ recognition.onend = function(event) {
 	'use strict';
 	if (!window.result || window.confidence < 0.6) {
 		console.log('Could you repeat that? Confidence: ' + window.confidence);
+		$('#i').html('Jarvis: Could you repeat that again?');
 		recognition.start();
 	}
 	window.result = false;
