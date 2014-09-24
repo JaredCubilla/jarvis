@@ -87,7 +87,7 @@ function parse(str) {
 			$('#i').html('Jarvis: ' + response);
 
 			query = strArray.slice(strArray.indexOf('for')+1, strArray.length).join(' ');
-			window.open(endpoint + query);
+			window.open(endpoint + query, '_self');
 
 			break;
 
