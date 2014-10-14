@@ -5,9 +5,17 @@ module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
 
 	grunt.initConfig({
+
 		wiredep: {
 			target: {
 				src: 'index.html'
+			}
+		},
+
+		concat: {
+			dist: {
+				src: ['assets/scripts/init.js', 'assets/scripts/parse.js', 'assets/scripts/main.js'],
+				dest: 'assets/scripts/main.concat.js'
 			}
 		},
 
@@ -40,7 +48,7 @@ module.exports = function (grunt) {
 		uglify: {
 			dist: {
 				files: {
-					'build/scripts/main.js': ['assets/scripts/main.js']
+					'build/scripts/main.js': ['assets/scripts/main.concat.js']
 				}
 			}
 		},
@@ -100,7 +108,8 @@ module.exports = function (grunt) {
 
 	});
 
+	grunt.registerTask('bower', ['wiredep']);
 	grunt.registerTask('css', ['newer:sass', 'newer:cssmin']);
-	grunt.registerTask('js', ['newer:jshint', 'newer:uglify']);
+	grunt.registerTask('js', ['newer:concat', 'newer:uglify']);
 	grunt.registerTask('default', ['css', 'js', 'connect', 'watch']);
 };
