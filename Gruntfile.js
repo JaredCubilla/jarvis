@@ -1,6 +1,16 @@
 module.exports = function (grunt) {
 	'use strict';
+
+	require('time-grunt')(grunt);
+	require('load-grunt-tasks')(grunt);
+
 	grunt.initConfig({
+		wiredep: {
+			target: {
+				src: 'index.html'
+			}
+		},
+
 		sass: {
 			dist: {
 				files: {
@@ -16,6 +26,7 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+
 
 		jshint: {
 			options: {
@@ -88,15 +99,6 @@ module.exports = function (grunt) {
 		}
 
 	});
-
-	grunt.loadNpmTasks('grunt-newer');
-	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-imagemin');
-	grunt.loadNpmTasks('grunt-contrib-sass');
-	grunt.loadNpmTasks('grunt-contrib-cssmin');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 	grunt.registerTask('css', ['newer:sass', 'newer:cssmin']);
 	grunt.registerTask('js', ['newer:jshint', 'newer:uglify']);

@@ -12,6 +12,10 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-newer": "~0.7.0",
     "grunt-contrib-imagemin": "~0.8.1",
-    "jshint-stylish": "~1.0.0"
+    "jshint-stylish": "~1.0.0",
+    "load-grunt-tasks": "~0.6.0",
+    "time-grunt": "~1.0.0",
+    "grunt-wiredep": "~1.9.0",
+    "grunt-contrib-concat": "~0.5.0"
   }
 }
