@@ -6,7 +6,6 @@
 	"indent": 4,
 	"latedef": true,
 	"noempty": true,
-	"undef": true,
 	"quotmark": "single",
 	"strict": true,
 
