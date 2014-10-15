@@ -12,13 +12,6 @@ module.exports = function (grunt) {
 			}
 		},
 
-		concat: {
-			dist: {
-				src: ['assets/scripts/init.js', 'assets/scripts/parse.js', 'assets/scripts/main.js'],
-				dest: 'assets/scripts/main.concat.js'
-			}
-		},
-
 		sass: {
 			dist: {
 				files: {
@@ -42,13 +35,13 @@ module.exports = function (grunt) {
 				jshintrc: '.jshintrc'
 			},
 
-			dist: ['Gruntfile.js', 'assets/scripts/**/*.js']
+			dist: ['Gruntfile.js', 'assets/scripts/main.js']
 		},
 
 		uglify: {
 			dist: {
 				files: {
-					'build/scripts/main.js': ['assets/scripts/main.concat.js']
+					'build/scripts/main.min.js': ['assets/scripts/main.js']
 				}
 			}
 		},
@@ -110,6 +103,6 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('bower', ['wiredep']);
 	grunt.registerTask('css', ['newer:sass', 'newer:cssmin']);
-	grunt.registerTask('js', ['newer:concat', 'newer:uglify']);
+	grunt.registerTask('js', ['newer:jshint', 'newer:uglify']);
 	grunt.registerTask('default', ['css', 'js', 'connect', 'watch']);
 };
