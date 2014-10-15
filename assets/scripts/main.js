@@ -1,16 +1,10 @@
-var app = angular.module('app', []);
-console.log(app);
-console.log('pisdafa');
-
-app.controller('conversation', function($scope) {
-	'use strict';
-	$scope.hello = 'world';
-});
-
-
 var recognition = new webkitSpeechRecognition(),
 	result = false,
 	confidence = 0;
+
+var conversation = [
+	{'f': 'i', 'str': ""}
+]
 
 function parse(str) {
 	'use strict';
