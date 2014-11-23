@@ -15,11 +15,24 @@
 
 	<body>
 		<button><i class= "fa fa-microphone" id= "microphone-button"></i></button>
+		<input type="text" id="input">
 		<p id= "you"></p>
-		<p id= "i"></p>
+		<p id= "i">
+			<div id="result"></div>
+		</p>
+
+		Core: <input type="checkbox" id="checkbox-0" checked disabled><br>
+		Webdev <input type="checkbox" id="checkbox-1">
+		Webdev <input type="checkbox" id="checkbox-2">
+		Webdev <input type="checkbox" id="checkbox-3">
+		Webdev <input type="checkbox" id="checkbox-4">
+		Webdev <input type="checkbox" id="checkbox-5">
+
 
 		<!-- bower:js -->
+		<script src="build/scripts/vendor/jquery/dist/jquery.js"></script>
+		<script src="build/scripts/vendor/moment/moment.js"></script>
 		<!-- endbower -->
-		<script src="build/scripts/main.min.js"></script>
+		<script src="assets/scripts/main.js"></script>
 	</body>
 </html>
