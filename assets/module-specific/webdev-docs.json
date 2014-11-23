@@ -1,0 +1,36 @@
+{
+  "bootstrap": "http://getbootstrap.com/",
+  "bootstrap javascript": "http://getbootstrap.com/javascript/",
+  "bootstrap css": "http://getbootstrap.com/css/",
+  "foundation": "http://foundation.zurb.com/docs/",
+  "semantic ui": "http://semantic-ui.com/",
+  "neat": "https://thoughtbot.github.io/neat-docs/latest/",
+  "jeet": "http://jeet.gs/",
+  "pure": "http://purecss.io/start/",
+  "pure css": "http://purecss.io/start/",
+  "ui kit": "http://getuikit.com/docs/documentation_get-started.html",
+  "uikit": "http://getuikit.com/docs/documentation_get-started.html",
+  "gumby": "http://gumbyframework.com/",
+  "susy": "http://susydocs.oddbird.net/en/latest/",
+
+  "jquery": "https://api.jquery.com/",
+  "yui": "http://yuilibrary.com/yui/docs/api/",
+  "zepto": "http://zeptojs.com/",
+  "mootools": "http://mootools.net/",
+  "underscore": "http://underscorejs.org/",
+  "lo-dash": "https://lodash.com/docs",
+
+  "angular": "https://docs.angularjs.org/api",
+  "angular js": "https://docs.angularjs.org/api",
+  "backbone": "http://backbonejs.org/",
+  "backbone js": "http://backbonejs.org/",
+  "ember": "http://emberjs.com/api/",
+  "ember js": "http://emberjs.com/api/",
+  "react": "https://facebook.github.io/react/docs/getting-started.html",
+
+  "haml": "http://haml.info/docs/yardoc/",
+  "slim": "http://www.rubydoc.info/gems/slim/frames",
+  "markdown": "http://daringfireball.net/projects/markdown/syntax",
+  "sass": "http://sass-lang.com/documentation/file.SASS_REFERENCE.html",
+  "less": "http://lesscss.org/#"
+}
