@@ -102,6 +102,7 @@ module.exports = function (grunt) {
 	});
 
 	grunt.registerTask('bower', ['wiredep']);
+	grunt.registerTask('bowerInstall', ['wiredep']);
 	grunt.registerTask('css', ['newer:sass', 'newer:cssmin']);
 	grunt.registerTask('js', ['newer:jshint', 'newer:uglify']);
 	grunt.registerTask('default', ['css', 'js', 'connect', 'watch']);
