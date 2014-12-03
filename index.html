@@ -6,27 +6,34 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>Jarvis</title>
-
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
 		<!-- bower:css -->
 		<link rel="stylesheet" href="build/scripts/vendor/font-awesome/css/font-awesome.css" />
+		<link rel="stylesheet" href="build/scripts/vendor/normalize-css/normalize.css" />
 		<!-- endbower -->
 		<link href="build/styles/main.css" rel="stylesheet">
 	</head>
 
 	<body>
-		<button><i class= "fa fa-microphone" id= "microphone-button"></i></button>
-		<input type="text" id="input">
-		<p id= "you"></p>
-		<p id= "i">
-			<div id="result"></div>
-		</p>
+		<div class="container">
+			<button><i class= "fa fa-microphone" id= "microphone-button"></i></button>
+			<input type="text" id="input">
+			<p id= "you"></p>
+			<p id= "i">
+				<div id="result"></div>
+			</p>
+			<div class="movie box">
+				<img src="http://static.metacritic.com/images/products/movies/4/ad5130de872b474ffe00fdbbc6a8b539-98.jpg">
+				<div class="info">Test</div>
+			</div>
 
-		Core: <input type="checkbox" id="checkbox-0" checked disabled><br>
-		Webdev <input type="checkbox" id="checkbox-1">
-		Webdev <input type="checkbox" id="checkbox-2">
-		Webdev <input type="checkbox" id="checkbox-3">
-		Webdev <input type="checkbox" id="checkbox-4">
+			Core: <input type="checkbox" id="checkbox-0" checked disabled><br>
+			Webdev <input type="checkbox" id="checkbox-1">
+			Webdev <input type="checkbox" id="checkbox-2">
+			Webdev <input type="checkbox" id="checkbox-3">
+			Webdev <input type="checkbox" id="checkbox-4">
 		Webdev <input type="checkbox" id="checkbox-5">
+		</div>
 
 
 		<!-- bower:js -->
