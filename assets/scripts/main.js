@@ -1,3 +1,11 @@
+
+if (typeof String.prototype.startsWith !== 'function') {
+  String.prototype.startsWith = function (str){
+  	'use strict';
+    return (this.slice(0, str.length) === str);
+  };
+}
+
 // creating the everything via an anonymous function, so as to add variables and preserve global namespace
 var App = function(){
 	'use strict';
@@ -40,35 +48,39 @@ var App = function(){
 	}
 
 	globals.allModules[0].parse = function(str) {
-		if (str.split('/')[0] === 'what is new on r') {
-			$.getJSON('https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + '/new.json?limit=10', function(json) {
-				var convoText = '<ol>';
+		if (str === 'what time is it' || str === 'what time is it now') {
+			addConvo(moment().format('h:mmA'));
+		} else if (str.split('/')[0] === 'what is trending on r' || str.split('/')[0] === 'what is hot on r' || str.split('/')[0] === 'what is new on r' || str.split('/')[0] === 'what is interesting on r') {
+			var redditJSON = '/hot.json?limit=10';
+			var comments = 's';
+
+			if (str.split('/')[0] === 'what is new on r') {
+				redditJSON = '/new.json?limit=10';
+			}
+
+			$.getJSON('https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + redditJSON, function(json) {
+				var convoText = '<div class="list"><div class="title"><b>trending</b> on <a href="https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + '"><b>r/' + str.split('/')[1].split(' ').join('') + '</b></a></div>';
 				for (var i = 0, len = json.data.children.length; i < len; i++) {
-					convoText += '<li><a href="' + json.data.children[i].data.url + '">' + json.data.children[i].data.title + '</a></li>';
+					if(!json.data.children[i].data.stickied) {
+						if (json.data.children[i].data.num_comments === 1) {
+							comments = '';
+						} else if (json.data.children[i].data.num_comments !== 1) {
+							comments = 's';
+						}
+						convoText += '<div class="item"><div class="title"><a href="' + json.data.children[i].data.url + '">' + json.data.children[i].data.title + '</a></div> <div class="meta">' + json.data.children[i].data.score + ' points | <a href="https://www.reddit.com' + json.data.children[i].data.permalink + '">' + json.data.children[i].data.num_comments + ' comment' + comments + '</a> | ' + moment.unix(json.data.children[i].data.created_utc).fromNow() + '</div></div>';
+					}
 				}
-				convoText += '</ol>';
-				addConvo(convoText);
-			}).fail(function(d, status, error) {
-				if (error === 'Forbidden') {
-					addConvo('It appears the subreddit you are trying to access is private. Sorry.');
-				} else if (error === 'Not Found') {
-					addConvo('I don\'t think that subreddit exists. Sorry.');
-				}
-			});
-		} else if (str.split('/')[0] === 'what is trending on r' || str.split('/')[0] === 'what is hot on r') {
-			$.getJSON('https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + '/hot.json?limit=10', function(json) {
-				var convoText = '<ol>';
-				for (var i = 0, len = json.data.children.length; i < len; i++) {
-					convoText += '<li><a href="' + json.data.children[i].data.url + '">' + json.data.children[i].data.title + '</a></li>';
-				}
-				convoText += '</ol>';
+				convoText += '</div>';
 				addConvo(convoText);
 			}).fail(function(d, status, error) {
 				$('#result').empty();
+				console.log('reddit failed');
 				if (error === 'Forbidden') {
 					addConvo('It appears the subreddit you are trying to access is private. Sorry.');
 				} else if (error === 'Not Found') {
 					addConvo('I don\'t think that subreddit exists. Sorry.');
+				} else if (status === 'error' && !error) {
+					addConvo('I wasn\'t able to do that. It\'s possible that the subreddit doesn\'t exist. Sorry.');
 				}
 			});
 		} else if (str.split(' ')[0] === 'calculate' || str.split(' ')[0] === 'compute') {
@@ -80,28 +92,32 @@ var App = function(){
 			$.get('https://www.calcatraz.com/calculator/api?c=' + calculateText, function(data) {
 				console.log(data);
 			});
+		} else if (str.startsWith('should i watch')) {
+			console.log(str.split('should i watch ').join(''));
+			$.ajax({
+				type: 'POST',
+			    url: 'https://byroredux-metacritic.p.mashape.com/find/movie?retry=4&title=Interstellar',
+			    headers: {'X-Mashape-Key': 'ufgugDhX2Qmsh6AyUSNw0dDrsHRlp19B8MvjsnTrGDJw6NeQ8u', 'Content-Type': 'application/x-www-form-urlencoded'},
+			}).done(function(data) {
+				console.log(data);
+			});
 		}
 	};
 
 	globals.allModules[1].parse = function(str) {
 		if (str === 'what is trending on hacker news' || str === 'what is hot on hacker news') {
-			$.getJSON('https://hacker-news.firebaseio.com/v0/topstories.json', function(json) {
-				var requests = [];
-				var convoText = '<ol>';
-				console.log('top stories getted');
+			$.getJSON('http://hnify.herokuapp.com/get/top/', function(json) {
+				var comments = 's';
+				var convoText = '<div class="list"><div class="title"><b>trending</b> on <a href="https://news.ycombinator.com/"><b>Hacker News</b></a></div>';
 				for (var i = 0; i < 10; i++) {
-					requests.push($.getJSON('https://hacker-news.firebaseio.com/v0/item/' + json[i] + '.json'));
+					if (json.stories[i].num_comments === 1) {
+						comments = '';
+					} else {
+						comments = 's';
+					}
+					convoText += '<div class="item"><div class="title"><a href="' + json.stories[i].link + '">' + json.stories[i].title + '</a></div><div class="meta">' + json.stories[i].points + ' points | <a href="' + json.stories[i].comments_link + '">' + json.stories[i].num_comments + ' comment' + comments + '</a> | ' + json.stories[i].published_time + '</div></div>';
 				}
-
-				$.when.apply($, requests).done(function() {
-					var results = [].slice.call(arguments);
-					var list = results.map(function(arr) {
-						return '<li><a href="' + arr[0].url + '">' + arr[0].title + '</a></li>';
-					});
-					var convoText = '<ol>' + list.join('') + '</ol>';
-					addConvo(convoText);
-				});
-
+				addConvo(convoText);
 			});
 		} else if ((str.split('get me the docs for').slice(1).length === 1 && str.split('get me the docs for ').slice(1)[0] !== '') || (str.split('get me the documentation for').slice(1).length === 1 && str.split('get me the documentation for ').slice(1)[0] !== '')) {
 			$.getJSON('assets/module-specific/webdev-docs.json', function(data) {
