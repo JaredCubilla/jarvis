@@ -4,5 +4,52 @@
 @import 'partials/mixins';
 
 body {
-	background-color: #ecf0f1;
+	font-family: $font;
+	font-weight: $light;
+	color: $blue;
+	background-color: $white;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.container {
+	width: 80%;
+	margin: 0 auto;
+}
+
+.list > .title {
+	font-size: $large-size;
+	padding: 5px 0px;
+	border-bottom: 3px solid;
+}
+
+.list > .item {
+	font-size: $medium-size;
+	padding: 5px 0px;
+}
+
+.list > .item > .title {
+	padding: 5px 0px;
+}
+
+.list > .item > .meta {
+	font-weight: $bold;
+	font-size: $tiny-size;
+}
+
+.box {
+	width: 400px;
+	height: 250px;
+	background-color: darken($white, 5%);
+}
+
+.box > .info {
+	display: inline;
 }
