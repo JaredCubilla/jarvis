@@ -24,32 +24,66 @@ a:hover {
 	margin: 0 auto;
 }
 
+#conversation {
+	.user {
+		padding: 5px 15px;
+		border-left: 5px solid;
+		margin: 10px 0px;
+		clear: right;
+	}
+
+	.jarvis {
+		padding: 5px 15px;
+		border-right: 5px solid;
+		margin: 10px 0px;
+		float: right;
+		clear: right;
+	}
+}
+
 .list > .title {
 	font-size: $large-size;
 	padding: 5px 0px;
 	border-bottom: 3px solid;
 }
 
-.list > .item {
-	font-size: $medium-size;
-	padding: 5px 0px;
-}
+.list {
+	clear: right;
 
-.list > .item > .title {
-	padding: 5px 0px;
-}
+	.item {
+		font-size: $medium-size;
+		padding: 5px 0px;
 
-.list > .item > .meta {
-	font-weight: $bold;
-	font-size: $tiny-size;
+		.title {
+			padding: 5px 0px;
+		}
+
+		.meta {
+			font-weight: $bold;
+			font-size: $tiny-size;
+		}
+	}
 }
 
 .box {
-	width: 400px;
-	height: 250px;
+	clear: right;
+	max-width: 100%;
 	background-color: darken($white, 5%);
-}
+	padding: 20px;
 
-.box > .info {
-	display: inline;
+	.title {
+		font-size: $large-size;
+		font-weight: bold;
+	}
+
+	.reviews {
+		margin-top: 10px;
+		font-size: $medium-size;
+		font-weight: bold;
+	}
+
+	.description {
+		margin-top: 10px;
+		font-size: $medium-size;
+	}
 }
