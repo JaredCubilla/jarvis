@@ -32,12 +32,20 @@ var App = function(){
 
 	function addConvo(str) {
 		globals.conversation.push({speaker: 'jarvis', text: str});
-		$('#result').html(str);
+		console.log(globals);
+		$('<div class="jarvis">' + str + '</div>').hide().appendTo('#conversation').fadeIn('fast');
+	}
+
+	function addDiv(str) {
+		globals.conversation.push({speaker: 'jarvis', text: str});
+		console.log(globals);
+		$(str).hide().appendTo('#conversation').fadeIn('fast');
 	}
 
 	function parseReady(str) {
 		var parsedText = str.toLowerCase().split(',').join('');
-		if (parsedText.split(' ')[0] === 'jarvis' || parsedText.split(' ')[0] === 'jervis') {
+		parsedText = str.toLowerCase().split('?').join('');
+		if (parsedText !== 'jarvis' && parsedText.split(' ')[0] === 'jarvis' || parsedText.split(' ')[0] === 'jervis') {
 			parsedText = parsedText.replace('jarvis', '');
 		}
 
@@ -48,9 +56,36 @@ var App = function(){
 	}
 
 	globals.allModules[0].parse = function(str) {
-		if (str === 'what time is it' || str === 'what time is it now') {
-			addConvo(moment().format('h:mmA'));
-		} else if (str.split('/')[0] === 'what is trending on r' || str.split('/')[0] === 'what is hot on r' || str.split('/')[0] === 'what is new on r' || str.split('/')[0] === 'what is interesting on r') {
+		if (str === 'what time is it' || str === 'what time is it now' || str === 'what is the time') {
+			addConvo('The time is <b>' + moment().format('h:mm A') + '</b>.');
+		} else if (str === 'hello' || str === 'hey' || str === 'hi' || str === 'hello jarvis' || str === 'hey jarvis' || str === 'hi jarvis') {
+			var response = ['Hello.', 'Hey.', 'Hi.'][Math.floor(Math.random() * 3)];
+			var url;
+			switch (response) {
+				case 'Hello.':
+					url = 'assets/module-specific/audio/Core/Hello.wav';
+					break;
+				case 'Hey.':
+					url = 'assets/module-specific/audio/Core/Hey.wav';
+					break;
+				case 'Hi.':
+					url = 'assets/module-specific/audio/Core/Hi.wav';
+					break;
+			}
+			var sound1 = new Howl({
+				urls: [url],
+				onend: function() {
+					var sound2 = new Howl({
+						urls: ['assets/module-specific/audio/Core/Assistance.wav']
+					}).play();
+				}
+			});
+
+			sound1.play();
+
+			addConvo(response + ' May I be of assistance?');
+
+	} else if (str.split('/')[0] === 'what is trending on r' || str.split('/')[0] === 'what is hot on r' || str.split('/')[0] === 'what is new on r' || str.split('/')[0] === 'what is interesting on r') {
 			var redditJSON = '/hot.json?limit=10';
 			var comments = 's';
 
@@ -59,7 +94,7 @@ var App = function(){
 			}
 
 			$.getJSON('https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + redditJSON, function(json) {
-				var convoText = '<div class="list"><div class="title"><b>trending</b> on <a href="https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + '"><b>r/' + str.split('/')[1].split(' ').join('') + '</b></a></div>';
+				var divText = '<div class="list"><div class="title"><b>trending</b> on <a href="https://www.reddit.com/r/' + str.split('/')[1].split(' ').join('') + '"><b>r/' + str.split('/')[1].split(' ').join('') + '</b></a></div>';
 				for (var i = 0, len = json.data.children.length; i < len; i++) {
 					if(!json.data.children[i].data.stickied) {
 						if (json.data.children[i].data.num_comments === 1) {
@@ -67,21 +102,47 @@ var App = function(){
 						} else if (json.data.children[i].data.num_comments !== 1) {
 							comments = 's';
 						}
-						convoText += '<div class="item"><div class="title"><a href="' + json.data.children[i].data.url + '">' + json.data.children[i].data.title + '</a></div> <div class="meta">' + json.data.children[i].data.score + ' points | <a href="https://www.reddit.com' + json.data.children[i].data.permalink + '">' + json.data.children[i].data.num_comments + ' comment' + comments + '</a> | ' + moment.unix(json.data.children[i].data.created_utc).fromNow() + '</div></div>';
+						divText += '<div class="item"><div class="title"><a href="' + json.data.children[i].data.url + '">' + json.data.children[i].data.title + '</a></div> <div class="meta">' + json.data.children[i].data.score + ' points | <a href="https://www.reddit.com' + json.data.children[i].data.permalink + '">' + json.data.children[i].data.num_comments + ' comment' + comments + '</a> | ' + moment.unix(json.data.children[i].data.created_utc).fromNow() + '</div></div>';
 					}
 				}
-				convoText += '</div>';
-				addConvo(convoText);
+				divText += '</div>';
+				var response = ['I believe this is what you requested.', 'Here you go.', 'Got it. Here you go.'][Math.floor(Math.random() * 3)];
+				var url;
+
+				switch (response) {
+					case 'I believe this is what you requested.':
+						url = 'assets/module-specific/audio/Core/Request.wav';
+						break;
+					case 'Here you go.':
+						url = 'assets/module-specific/audio/Core/Here-you-go.wav';
+						break;
+					case 'Got it. Here you go.':
+						url = 'assets/module-specific/audio/Core/Got-It.wav';
+				}
+
+				var sound1 = new Howl({
+					urls: [url]
+				}).play();
+
+				addConvo(response);
+				addDiv(divText);
 			}).fail(function(d, status, error) {
 				$('#result').empty();
 				console.log('reddit failed');
+				var url;
 				if (error === 'Forbidden') {
 					addConvo('It appears the subreddit you are trying to access is private. Sorry.');
+					url = 'assets/module-specific/audio/Core/Subreddit-Private.wav';
 				} else if (error === 'Not Found') {
 					addConvo('I don\'t think that subreddit exists. Sorry.');
+					url = 'assets/module-specific/audio/Core/Subreddit-Exists.wav';
 				} else if (status === 'error' && !error) {
 					addConvo('I wasn\'t able to do that. It\'s possible that the subreddit doesn\'t exist. Sorry.');
+					url = 'assets/module-specific/audio/Core/Subreddit-Unknown.wav';
 				}
+				var sound1 = new Howl({
+					urls: [url]
+				}).play();
 			});
 		} else if (str.split(' ')[0] === 'calculate' || str.split(' ')[0] === 'compute') {
 			var calculateText = str.split(' ');
@@ -93,13 +154,40 @@ var App = function(){
 				console.log(data);
 			});
 		} else if (str.startsWith('should i watch')) {
-			console.log(str.split('should i watch ').join(''));
 			$.ajax({
-				type: 'POST',
-			    url: 'https://byroredux-metacritic.p.mashape.com/find/movie?retry=4&title=Interstellar',
-			    headers: {'X-Mashape-Key': 'ufgugDhX2Qmsh6AyUSNw0dDrsHRlp19B8MvjsnTrGDJw6NeQ8u', 'Content-Type': 'application/x-www-form-urlencoded'},
+				type: 'GET',
+			    url: 'http://www.omdbapi.com/?t=' + encodeURIComponent(str.split('should i watch ').join('')) + '&plot=short&r=json&tomatoes=true',
 			}).done(function(data) {
-				console.log(data);
+				var realdata = $.parseJSON(data);
+				if (realdata.Error !== 'Movie not found!' || realdata.Type === 'episode') {
+					if (realdata.Type === 'movie') {
+						realdata.type = 'Film';
+					} else if (realdata.Type === 'series') {
+						realdata.type = 'TV Series';
+					}
+
+					var reviews = '<div class="reviews">';
+					if (realdata.imdbRating !== 'N/A') {
+						reviews += '<div class="review">IMDB: ' + realdata.imdbRating + '/10</div>';
+					}
+
+					if(realdata.tomatoMeter !== 'N/A') {
+						reviews += '<div class="review">Rotten Tomatoes: ' + realdata.tomatoMeter + '/10</div>';
+					}
+
+					if(realdata.Metascore !== 'N/A') {
+						reviews += '<div class="review">Metacritic: ' + realdata.Metascore + '/10</div>';
+					}
+
+					var convoText = '<div class="movie box"><div class="title">' + realdata.Title + '</div><div class="subtitle">' + realdata.Year + ' ' + realdata.type + '</div><div class="description">' + realdata.Plot + '</div>' + reviews + '</div>';
+					var sound1 = new Howl({
+						urls: ['assets/module-specific/audio/Core/What-I-Could-Find.wav']
+					}).play();
+					addConvo('Here\'s what I could find:');
+					addDiv(convoText);
+				} else {
+					addConvo('Sorry, I couldn\'t find that movie.');
+				}
 			});
 		}
 	};
@@ -117,13 +205,34 @@ var App = function(){
 					}
 					convoText += '<div class="item"><div class="title"><a href="' + json.stories[i].link + '">' + json.stories[i].title + '</a></div><div class="meta">' + json.stories[i].points + ' points | <a href="' + json.stories[i].comments_link + '">' + json.stories[i].num_comments + ' comment' + comments + '</a> | ' + json.stories[i].published_time + '</div></div>';
 				}
-				addConvo(convoText);
+				var response = ['I believe this is what you requested.', 'Here you go.', 'Got it. Here you go.'][Math.floor(Math.random() * 3)];
+				var url;
+
+				switch (response) {
+					case 'I believe this is what you requested.':
+						url = 'assets/module-specific/audio/Core/Request.wav';
+						break;
+					case 'Here you go.':
+						url = 'assets/module-specific/audio/Core/Here-you-go.wav';
+						break;
+					case 'Got it. Here you go.':
+						url = 'assets/module-specific/audio/Core/Got-It.wav';
+				}
+
+				var sound1 = new Howl({
+					urls: [url]
+				}).play();
+				addConvo(response);
+				addDiv(convoText);
 			});
 		} else if ((str.split('get me the docs for').slice(1).length === 1 && str.split('get me the docs for ').slice(1)[0] !== '') || (str.split('get me the documentation for').slice(1).length === 1 && str.split('get me the documentation for ').slice(1)[0] !== '')) {
 			$.getJSON('assets/module-specific/webdev-docs.json', function(data) {
 				console.log(typeof data[str.split('get me the docs for ').slice(1)[0]]);
 				if (typeof data[str.split('get me the docs for ').slice(1)[0]] === 'string') {
-					addConvo('<a href="' + data[str.split('get me the docs for ').slice(1)[0]] + '">' + data[str.split('get me the docs for ').slice(1)[0]] + '</a>');
+					var sound1 = new Howl({
+						urls: ['assets/module-specific/audio/Core/Here-you-go.wav']
+					}).play();
+					addConvo('Here you go: <a href="' + data[str.split('get me the docs for ').slice(1)[0]] + '">' + data[str.split('get me the docs for ').slice(1)[0]] + '</a>');
 				} else {
 					addConvo('I don\'t know about that library. Sorry.');
 				}
@@ -153,7 +262,19 @@ var App = function(){
 
 	$('#input').keypress(function(e) {
 		if (e.keyCode === 13) {
-			parse(parseReady($('#input').val()));
+			globals.conversation.push({speaker: 'user', text: '<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>'});
+			$('<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>').hide().appendTo('#conversation').fadeIn('fast');
+			setTimeout(function() {
+				parse(parseReady($('#input').val()));
+			}, 1000);
+
+			console.log(globals.conversation.length);
+			if (globals.conversation.length >= 5) {
+				console.log('yup');
+				$('#conversation div:lt(2)').fadeOut('fast', function() {
+					$(this).remove();
+				});
+			}
 		}
 	});
 
@@ -179,7 +300,14 @@ var App = function(){
 				globals.conversation.push(convo);
 				console.log('User said \'' + convo.text + '\'.');
 
-				parse(parseReady(convo.text));
+				$('<div class="user">' + convo.text + '</div>').hide().appendTo('#conversation').fadeIn('fast');
+				setTimeout(function() {
+					parse(parseReady(convo.text));
+				}, 1000);
+
+				if (globals.conversation.length === 4) {
+					$('#conversation:first-child').fadeOut('fast');
+				}
 
 			} else {
 				console.log('Result rejected, due to lack of confidence. Condidence: ' + event.results[0][0].confidence);
@@ -190,7 +318,20 @@ var App = function(){
 		globals.recognition.onend = function() {
 			// checks if there was confident result
 			if (!globals.result) {
-				console.log('No result. Starting recognition again.');
+				var text = ['Could you repeat that again?', 'Sorry, do you mind repeating that again?'][Math.floor(Math.random() * 2)];
+				var sound1, url;
+				switch (text) {
+					case 'Could you repeat that again?':
+						url = 'assets/module-specific/audio/Core/Repeat1.wav';
+						break;
+					case 'Sorry, do you mind repeating that again?':
+						url = 'assets/module-specific/audio/Core/Repeat2.wav';
+						break;
+				}
+				sound1 = new Howl({
+					urls: [url]
+				}).play();
+				addConvo(text);
 				globals.recognition.start();
 			}
 
