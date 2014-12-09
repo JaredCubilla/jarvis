@@ -27,27 +27,30 @@ var App = function(){
 	globals.modules = [0];
 	globals.allModules = [
 		{name: 'core', description: 'Includes all basic features for Jarvis. Only mandatory module.'},
-		{name: 'webdev', description: 'Includes features for web developers and web designers, such as docs for popular libraries, placeholder text/images, and trending dev news.'}
+		{name: 'webdev', description: 'Includes features for web developers and web designers, such as docs for popular libraries, placeholder text/images, and trending dev news.'},
+		{name: 'random', description: 'Includes basic random generators, including coin flips, dice rolls and others.'}
 	];
 
 	function addConvo(str) {
 		globals.conversation.push({speaker: 'jarvis', text: str});
-		console.log(globals);
-		$('<div class="jarvis">' + str + '</div>').hide().appendTo('#conversation').fadeIn('fast');
+		$('<div class="jarvis">' + str + '</div>').hide().appendTo('#conversation').fadeIn(200);
 	}
 
 	function addDiv(str) {
 		globals.conversation.push({speaker: 'jarvis', text: str});
-		console.log(globals);
-		$(str).hide().appendTo('#conversation').fadeIn('fast');
+		$(str).hide().appendTo('#conversation').fadeIn(200);
 	}
 
 	function parseReady(str) {
 		var parsedText = str.toLowerCase().split(',').join('');
 		parsedText = str.toLowerCase().split('?').join('');
-		if (parsedText !== 'jarvis' && parsedText.split(' ')[0] === 'jarvis' || parsedText.split(' ')[0] === 'jervis') {
-			parsedText = parsedText.replace('jarvis', '');
+		if (parsedText.split(' ')[0] === 'jarvis' || parsedText.split(' ')[0] === 'jervis') {
+			parsedText = parsedText.replace('jarvis ', '');
+			parsedText = parsedText.replace('jervis ', '');
 		}
+
+		parsedText = parsedText.split('fuck').join('f**k');
+		parsedText = parsedText.split('shit').join('s**t');
 
 		parsedText = parsedText.split('underscore').join('_');
 		parsedText = parsedText.split('what\'s').join('what is');
@@ -56,8 +59,29 @@ var App = function(){
 	}
 
 	globals.allModules[0].parse = function(str) {
-		if (str === 'what time is it' || str === 'what time is it now' || str === 'what is the time') {
+		var sound1;
+		if (str.indexOf('f**k') !== -1 || str.indexOf('s**t') !== -1) {
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/No-Swearing.wav']
+			}).play();
+			addConvo('Hey! No swearing!');
+		} else if (str === 'who are you' || str === 'what are you' || str === 'what do you do') {
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/I-Am.wav']
+			}).play();
+			addConvo('I am Jarvis, an intelligent voice-powered virtual personal assistant. I\'m basically Siri for the web, but more extensible, and open-source too.');
+		} else if (str === 'what time is it' || str === 'what time is it now' || str === 'what is the time') {
 			addConvo('The time is <b>' + moment().format('h:mm A') + '</b>.');
+		} else if (str === 'i love you' || str === 'i like you') {
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/Ditto.wav']
+			}).play();
+			addConvo('Ditto.');
+		} else if (str === 'make me a sandwich') {
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/Sandwich.wav']
+			}).play();
+			addConvo('Poof! You\'re a sandwich!');
 		} else if (str === 'hello' || str === 'hey' || str === 'hi' || str === 'hello jarvis' || str === 'hey jarvis' || str === 'hi jarvis') {
 			var response = ['Hello.', 'Hey.', 'Hi.'][Math.floor(Math.random() * 3)];
 			var url;
@@ -72,18 +96,19 @@ var App = function(){
 					url = 'assets/module-specific/audio/Core/Hi.wav';
 					break;
 			}
-			var sound1 = new Howl({
+			sound1 = new Howl({
 				urls: [url],
 				onend: function() {
 					var sound2 = new Howl({
 						urls: ['assets/module-specific/audio/Core/Assistance.wav']
 					}).play();
 				}
-			});
-
-			sound1.play();
+			}).play();
 
 			addConvo(response + ' May I be of assistance?');
+
+	} else if (str.startsWith('go to ')) {
+		console.log('go to');
 
 	} else if (str.split('/')[0] === 'what is trending on r' || str.split('/')[0] === 'what is hot on r' || str.split('/')[0] === 'what is new on r' || str.split('/')[0] === 'what is interesting on r') {
 			var redditJSON = '/hot.json?limit=10';
@@ -144,15 +169,6 @@ var App = function(){
 					urls: [url]
 				}).play();
 			});
-		} else if (str.split(' ')[0] === 'calculate' || str.split(' ')[0] === 'compute') {
-			var calculateText = str.split(' ');
-			if (str.split(' ')[1] === 'the') {
-				calculateText = calculateText.splice(1, 1);
-			}
-			calculateText = calculateText.join('+');
-			$.get('https://www.calcatraz.com/calculator/api?c=' + calculateText, function(data) {
-				console.log(data);
-			});
 		} else if (str.startsWith('should i watch')) {
 			$.ajax({
 				type: 'GET',
@@ -166,24 +182,32 @@ var App = function(){
 						realdata.type = 'TV Series';
 					}
 
-					var reviews = '<div class="reviews">';
+					var reviews = '<div class="reviews">', sum = 0, count = 0;
 					if (realdata.imdbRating !== 'N/A') {
 						reviews += '<div class="review">IMDB: ' + realdata.imdbRating + '/10</div>';
+						sum += parseFloat(realdata.imdbRating) * 10;
+						count++;
 					}
 
 					if(realdata.tomatoMeter !== 'N/A') {
-						reviews += '<div class="review">Rotten Tomatoes: ' + realdata.tomatoMeter + '/10</div>';
+						reviews += '<div class="review">Rotten Tomatoes: ' + realdata.tomatoMeter + '/100</div>';
+						sum += parseFloat(realdata.tomatoMeter);
+						count++;
 					}
 
 					if(realdata.Metascore !== 'N/A') {
-						reviews += '<div class="review">Metacritic: ' + realdata.Metascore + '/10</div>';
+						reviews += '<div class="review">Metacritic: ' + realdata.Metascore + '/100</div>';
+						sum += parseFloat(realdata.Metascore);
+						count++;
 					}
+
+					reviews += '<div class="review">Average: ' + Math.round(sum / count * 100) / 100 + '%</div></div>';
 
 					var convoText = '<div class="movie box"><div class="title">' + realdata.Title + '</div><div class="subtitle">' + realdata.Year + ' ' + realdata.type + '</div><div class="description">' + realdata.Plot + '</div>' + reviews + '</div>';
 					var sound1 = new Howl({
 						urls: ['assets/module-specific/audio/Core/What-I-Could-Find.wav']
 					}).play();
-					addConvo('Here\'s what I could find:');
+					addConvo('Here is what I could find:');
 					addDiv(convoText);
 				} else {
 					addConvo('Sorry, I couldn\'t find that movie.');
@@ -225,9 +249,16 @@ var App = function(){
 				addConvo(response);
 				addDiv(convoText);
 			});
-		} else if ((str.split('get me the docs for').slice(1).length === 1 && str.split('get me the docs for ').slice(1)[0] !== '') || (str.split('get me the documentation for').slice(1).length === 1 && str.split('get me the documentation for ').slice(1)[0] !== '')) {
+		} else if (str.startsWith('get me the docs for ') || str.startsWith('get me the documentation for ')) {
+			var startwith;
+
+			if (str.startsWith('get me the docs for ')) {
+				startwith = 'get me the docs for ';
+			} else if (str.startsWith('get me the documentation for ')) {
+				startwith = 'get me the documentation for ';
+			}
 			$.getJSON('assets/module-specific/webdev-docs.json', function(data) {
-				console.log(typeof data[str.split('get me the docs for ').slice(1)[0]]);
+				console.log(typeof data[str.split(startwith).slice(1)[0]]);
 				if (typeof data[str.split('get me the docs for ').slice(1)[0]] === 'string') {
 					var sound1 = new Howl({
 						urls: ['assets/module-specific/audio/Core/Here-you-go.wav']
@@ -262,19 +293,17 @@ var App = function(){
 
 	$('#input').keypress(function(e) {
 		if (e.keyCode === 13) {
-			globals.conversation.push({speaker: 'user', text: '<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>'});
-			$('<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>').hide().appendTo('#conversation').fadeIn('fast');
-			setTimeout(function() {
-				parse(parseReady($('#input').val()));
-			}, 1000);
+			$('#conversation div').fadeOut(100, function() {
+				$(this).remove();
+			});
 
-			console.log(globals.conversation.length);
-			if (globals.conversation.length >= 5) {
-				console.log('yup');
-				$('#conversation div:lt(2)').fadeOut('fast', function() {
-					$(this).remove();
-				});
-			}
+			setTimeout(function() {
+				globals.conversation.push({speaker: 'user', text: '<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>'});
+				$('<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>').hide().appendTo('#conversation').fadeIn(200);
+				setTimeout(function() {
+					parse(parseReady($('#input').val()));
+				}, 500);
+			}, 200);
 		}
 	});
 
@@ -285,6 +314,8 @@ var App = function(){
 		// called when recognition is started
 		globals.recognition.onstart = function() {
 			console.log('Recognition started.');
+			$('#microphone-button').addClass('recording');
+			$('#microphone-button .fa').addClass('recording');
 		};
 
 		// called when a result is found
@@ -294,20 +325,24 @@ var App = function(){
 				globals.result = true;
 				console.log('Recognition result detected.');
 
-				// pushing this piece of conversation to the conversation object
-				var convo = {speaker: 'user'};
-				convo.text = event.results[0][0].transcript.charAt(0).toUpperCase() + event.results[0][0].transcript.slice(1);
-				globals.conversation.push(convo);
-				console.log('User said \'' + convo.text + '\'.');
+				$('#conversation div').fadeOut(100, function() {
+					$(this).remove();
+				});
 
-				$('<div class="user">' + convo.text + '</div>').hide().appendTo('#conversation').fadeIn('fast');
+
 				setTimeout(function() {
-					parse(parseReady(convo.text));
-				}, 1000);
+					var convo = {speaker: 'user'};
+					convo.text = event.results[0][0].transcript.charAt(0).toUpperCase() + event.results[0][0].transcript.slice(1);
+					globals.conversation.push(convo);
+					console.log('User said \'' + convo.text + '\'.');
 
-				if (globals.conversation.length === 4) {
-					$('#conversation:first-child').fadeOut('fast');
-				}
+					$('<div class="user">' + convo.text + '</div>').hide().appendTo('#conversation').fadeIn(200);
+					setTimeout(function() {
+						$('#loading').fadeIn(500);
+						parse(parseReady(convo.text));
+						$('#loading').fadeOut(500);
+					}, 500);
+				}, 200);
 
 			} else {
 				console.log('Result rejected, due to lack of confidence. Condidence: ' + event.results[0][0].confidence);
@@ -317,6 +352,8 @@ var App = function(){
 		// called when recognition is ended
 		globals.recognition.onend = function() {
 			// checks if there was confident result
+			$('#microphone-button').removeClass('recording');
+			$('#microphone-button .fa').removeClass('recording');
 			if (!globals.result) {
 				var text = ['Could you repeat that again?', 'Sorry, do you mind repeating that again?'][Math.floor(Math.random() * 2)];
 				var sound1, url;
@@ -341,7 +378,15 @@ var App = function(){
 
 		// initializing function
 		init = function() {
-			document.getElementById('microphone-button').addEventListener('click', function(event) {
+			$('#microphone-button').hover(function() {
+				$(this).addClass('hover');
+				$('#microphone-button .fa').addClass('hover');
+			}, function() {
+				$(this).removeClass('hover');
+				$('#microphone-button .fa').removeClass('hover');
+			});
+
+			$('#microphone-button').click(function() {
 				globals.recognition.start();
 			});
 		};
