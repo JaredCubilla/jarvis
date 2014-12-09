@@ -6,6 +6,13 @@ if (typeof String.prototype.startsWith !== 'function') {
   };
 }
 
+if (typeof String.prototype.endsWith !== 'function') {
+	String.prototype.endsWith = function(suffix) {
+		'use strict';
+    	return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	};
+}
+
 // creating the everything via an anonymous function, so as to add variables and preserve global namespace
 var App = function(){
 	'use strict';
@@ -23,6 +30,7 @@ var App = function(){
 	globals.recognition = (window.SpeechRecognition) ? new SpeechRecognition() : false;
 	globals.result = false;
 	globals.conversation = [];
+	globals.found = true;
 
 	globals.modules = [0];
 	globals.allModules = [
@@ -60,6 +68,7 @@ var App = function(){
 
 	globals.allModules[0].parse = function(str) {
 		var sound1;
+		var url;
 		if (str.indexOf('f**k') !== -1 || str.indexOf('s**t') !== -1) {
 			sound1 = new Howl({
 				urls: ['assets/module-specific/audio/Core/No-Swearing.wav']
@@ -82,9 +91,99 @@ var App = function(){
 				urls: ['assets/module-specific/audio/Core/Sandwich.wav']
 			}).play();
 			addConvo('Poof! You\'re a sandwich!');
+		} else if (str.startsWith('search')) {
+			var endpoint;
+			switch (str.split(' ').slice(1, str.split(' ').indexOf('for')).join(' ')) {
+				case '':
+				case 'google':
+					endpoint = 'https://www.google.com/search?q=';
+					break;
+				case 'bing':
+					endpoint = 'https://www.bing.com/search?q=';
+					break;
+				case 'google images':
+				case 'images':
+				case 'pictures':
+					endpoint = 'https://www.google.com/search?site=&tbm=isch&q=';
+					break;
+				case 'youtube':
+				case 'video':
+				case 'videos':
+					endpoint = 'https://www.youtube.com/results?search_query=';
+					break;
+				case 'vimeo':
+					endpoint = 'http://vimeo.com/search?q=';
+					break;
+				case 'github':
+					endpoint = 'https://github.com/search?utf8=✓&q=';
+					break;
+				case 'spotify':
+					endpoint = 'https://play.spotify.com/search/';
+					break;
+				case 'duckduckgo':
+				case 'duck duck go':
+					endpoint = 'https://duckduckgo.com/?q=';
+					break;
+				case 'flickr':
+				case 'flicker':
+					endpoint = 'https://www.flickr.com/search/?q=';
+					break;
+				case 'behance':
+					endpoint = 'https://www.behance.net/search?search=';
+					break;
+				case 'dribble':
+				case 'dribbble':
+					endpoint = 'https://dribbble.com/search?q=';
+					break;
+				case 'wikipedia':
+					endpoint = 'https://en.wikipedia.org/wiki/';
+					break;
+				case 'stack overflow':
+				case 'stackoverflow':
+				case 'stock overflow':
+					endpoint = 'http://stackoverflow.com/search?q=';
+					break;
+				case 'soundcloud':
+				case 'sound cloud':
+					endpoint = 'https://soundcloud.com/search?q=';
+					break;
+				case 'last.fm':
+				case 'last dot fm':
+				case 'last. fm':
+					endpoint = 'http://www.last.fm/search?q=';
+					break;
+				default:
+					endpoint = 'https://www.google.com/search?q=';
+			}
+			var query = str.split(' ').slice(str.split(' ').indexOf('for')+1, str.split(' ').length).join(' ');
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/New-Tab.wav'],
+				onend: function() {
+					window.open(endpoint + query, '_blank');
+				}
+			}).play();
+			addConvo('Opening new tab in 3, 2, 1...');
+
+		} else if (str.startsWith('go to ') || str.startsWith('goto ')) {
+			if (str.startsWith('go to')) {
+				url = str.replace('go to ', '').split(' ').join('');
+			} else if (str.startsWith('goto')) {
+				url = str.replace('goto ', '').split(' ').join('');
+			}
+
+			if (url.indexOf('.') === -1) {
+				url += '.com';
+			}
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/New-Tab.wav'],
+				onend: function() {
+					window.open('https://www.' + url, '_blank');
+				}
+			}).play();
+			addConvo('Opening new tab in 3, 2, 1...');
+
 		} else if (str === 'hello' || str === 'hey' || str === 'hi' || str === 'hello jarvis' || str === 'hey jarvis' || str === 'hi jarvis') {
 			var response = ['Hello.', 'Hey.', 'Hi.'][Math.floor(Math.random() * 3)];
-			var url;
 			switch (response) {
 				case 'Hello.':
 					url = 'assets/module-specific/audio/Core/Hello.wav';
@@ -201,7 +300,7 @@ var App = function(){
 						count++;
 					}
 
-					reviews += '<div class="review">Average: ' + Math.round(sum / count * 100) / 100 + '%</div></div>';
+					reviews += '<br><div class="review">Average: ' + Math.round(sum / count * 100) / 100 + '%</div></div>';
 
 					var convoText = '<div class="movie box"><div class="title">' + realdata.Title + '</div><div class="subtitle">' + realdata.Year + ' ' + realdata.type + '</div><div class="description">' + realdata.Plot + '</div>' + reviews + '</div>';
 					var sound1 = new Howl({
@@ -213,6 +312,8 @@ var App = function(){
 					addConvo('Sorry, I couldn\'t find that movie.');
 				}
 			});
+		} else {
+			globals.found = false;
 		}
 	};
 
@@ -268,6 +369,8 @@ var App = function(){
 					addConvo('I don\'t know about that library. Sorry.');
 				}
 			});
+		} else {
+			globals.found = false;
 		}
 	};
 
@@ -289,6 +392,27 @@ var App = function(){
 				}
 			}
 		}
+
+		$('#loading').fadeOut(100);
+
+		if (globals.found === false) {
+			addConvo('Sorry, I couldn\'t figure out what you wanted me to do. I\'ll bring you to a Google Search instead.');
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/No-Go.wav'],
+				onend: function() {
+					addConvo('Opening new tab in 3, 2, 1...');
+					var sound2 = new Howl({
+						urls: ['assets/module-specific/audio/Core/New-Tab.wav'],
+						onend: function() {
+							window.open('https://www.google.ca/search?q=' + str, '_blank');
+						}
+					}).play();
+				}
+			}).play();
+			addConvo('Opening new tab in 3, 2, 1...');
+
+		}
+
 	}
 
 	$('#input').keypress(function(e) {
@@ -301,6 +425,7 @@ var App = function(){
 				globals.conversation.push({speaker: 'user', text: '<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>'});
 				$('<div class="user">' + $('#input').val().charAt(0).toUpperCase() + $('#input').val().slice(1) + '</div>').hide().appendTo('#conversation').fadeIn(200);
 				setTimeout(function() {
+					$('#loading').fadeIn(100);
 					parse(parseReady($('#input').val()));
 				}, 500);
 			}, 200);
@@ -338,9 +463,8 @@ var App = function(){
 
 					$('<div class="user">' + convo.text + '</div>').hide().appendTo('#conversation').fadeIn(200);
 					setTimeout(function() {
-						$('#loading').fadeIn(500);
+						$('#loading').fadeIn(100);
 						parse(parseReady(convo.text));
-						$('#loading').fadeOut(500);
 					}, 500);
 				}, 200);
 
@@ -366,10 +490,12 @@ var App = function(){
 						break;
 				}
 				sound1 = new Howl({
-					urls: [url]
+					urls: [url],
+					onend: function() {
+						globals.recognition.start();
+					}
 				}).play();
 				addConvo(text);
-				globals.recognition.start();
 			}
 
 			globals.result = false;
