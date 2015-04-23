@@ -13,6 +13,46 @@ if (typeof String.prototype.endsWith !== 'function') {
 	};
 }
 
+function number(num) {
+	'use strict';
+	var howl, howl2, howl3;
+	if (num < 21) {
+		howl = new Howl({
+			urls: ['assets/module-specific/audio/number/' + num.toString() + '.wav']
+		}).play();
+	} else if (num < 100) {
+		howl = new Howl({
+			urls: ['assets/module-specific/audio/number/' + num.toString().charAt(0) + '0.wav'],
+			onend: function() {
+				if (num.toString().charAt(1) !== '0') {
+					howl2 = new Howl({
+						urls: ['assets/module-specific/audio/number/' + num.toString().charAt(1) + '.wav']
+					}).play();
+				}
+			}
+		}).play();
+	} else if (num < 1000) {
+		howl = new Howl({
+			urls: ['assets/module-specific/audio/number/' + num.toString().charAt(0) + '.wav'],
+			onend: function() {
+				howl2 = new Howl({
+					urls: ['assets/module-specific/audio/number/100.wav'],
+					onend: function() {
+						if (num % 100 !== 0) {
+							howl3 = new Howl({
+								urls: ['assets/module-specific/audio/number/and.wav'],
+								onend: function() {
+									number(parseInt(num.toString().substring(1)));
+								}
+							}).play();
+						}
+					}
+				}).play();
+			}
+		}).play();
+	}
+}
+
 // creating the everything via an anonymous function, so as to add variables and preserve global namespace
 var App = function(){
 	'use strict';
@@ -59,6 +99,10 @@ var App = function(){
 
 		parsedText = parsedText.split('fuck').join('f**k');
 		parsedText = parsedText.split('shit').join('s**t');
+		parsedText = parsedText.split('bitch').join('b***h');
+		parsedText = parsedText.split('cunt').join('c**t');
+		parsedText = parsedText.split('asshole').join('a******');
+		parsedText = parsedText.split('asswipe').join('a******');
 
 		parsedText = parsedText.split('underscore').join('_');
 		parsedText = parsedText.split('what\'s').join('what is');
@@ -67,9 +111,9 @@ var App = function(){
 	}
 
 	globals.allModules[0].parse = function(str) {
-		var sound1;
+		var sound1, sound2, sound3, sound4;
 		var url;
-		if (str.indexOf('f**k') !== -1 || str.indexOf('s**t') !== -1) {
+		if (str.indexOf('f**k') !== -1 || str.indexOf('s**t') !== -1 || str.indexOf('b***h') !== -1 || str.indexOf('c**t') !== -1) {
 			sound1 = new Howl({
 				urls: ['assets/module-specific/audio/Core/No-Swearing.wav']
 			}).play();
@@ -80,6 +124,31 @@ var App = function(){
 			}).play();
 			addConvo('I am Jarvis, an intelligent voice-powered virtual personal assistant. I\'m basically Siri for the web, but more extensible, and open-source too.');
 		} else if (str === 'what time is it' || str === 'what time is it now' || str === 'what is the time') {
+			sound1 = new Howl({
+				urls: ['assets/module-specific/audio/Core/Time.wav'],
+				onend: function() {
+					sound2 = new Howl({
+						urls: ['assets/module-specific/audio/number/' + parseInt(moment().format('h')) + '.wav'],
+						onend: function() {
+							if (!(parseInt(moment().format('mm')))) {
+								sound3 = new Howl({
+									urls: ['assets/module-specific/audio/number/o-clock.wav']
+								}).play();
+
+							} else if (parseInt(moment().format('mm')) < 10) {
+								sound3 = new Howl({
+									urls: ['assets/module-specific/audio/number/0 - 2.wav'],
+									onend: function() {
+										number(parseInt(moment().format('mm')));
+									}
+								}).play();
+							} else {
+								number(moment().format('mm'));
+							}
+						}
+					}).play();
+				}
+			}).play();
 			addConvo('The time is <b>' + moment().format('h:mm A') + '</b>.');
 		} else if (str === 'i love you' || str === 'i like you') {
 			sound1 = new Howl({
@@ -273,7 +342,7 @@ var App = function(){
 				type: 'GET',
 			    url: 'http://www.omdbapi.com/?t=' + encodeURIComponent(str.split('should i watch ').join('')) + '&plot=short&r=json&tomatoes=true',
 			}).done(function(data) {
-				var realdata = $.parseJSON(data);
+				var realdata = data;
 				if (realdata.Error !== 'Movie not found!' || realdata.Type === 'episode') {
 					if (realdata.Type === 'movie') {
 						realdata.type = 'Film';
