@@ -381,6 +381,52 @@ var App = function(){
 					addConvo('Sorry, I couldn\'t find that movie.');
 				}
 			});
+		} else if (str === 'tell me a joke' || str === 'make me laugh' || str === 'be funny') {
+			var joke = Math.floor(Math.random() * 10);
+			switch (joke) {
+				case 0:
+					// Howl joke 0
+					break;
+				case 1:
+					// Howl joke 1
+					break;
+				case 2:
+					// Howl joke 2
+					break;
+				case 3:
+					// Howl joke 3
+					break;
+				case 4:
+					// Howl joke 4
+					break;
+				case 5:
+					// Howl joke 5
+					break;
+				case 6:
+					// Howl joke 6
+					break;
+				case 7:
+					// Howl joke 7
+					break;
+				case 8:
+					// Howl joke 8
+					break;
+				case 9:
+					// Howl joke 9
+			}
+			addConvo([
+				/*0*/'The last thing I want to do is hurt you, but it\'s still on the list.',
+				/*1*/'The early bird might get the worm, but the second mouse gets the cheese.',
+				/*2*/'I think my neighbour\'s stalking me because she\'s been Googling my name. I saw it through my telescope last night.',
+				/*3*/'I hate when I\'m about to hug someone really attractive and I hit the mirror.',
+				/*4*/'Apparently, I snore so loudly that it scares everyone in the car I\'m driving.',
+				/*5*/'I used to think that I was indecisive, but now I\'m not sure.',
+				/*6*/'There are three kinds of people in this world. Those who can count and those who can\'t.',
+				/*7*/'I like birthdays, but like everything else: too much will kill you.',
+				/*8*/'There\'s two types of people in this world. Those who finish their sentences',
+				/*9*/'Woman shouldn\'t have children after 35. Really ... 35 is enough.'
+				][joke]);
+			console.log(joke);
 		} else {
 			globals.found = false;
 		}
