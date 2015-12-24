@@ -425,7 +425,7 @@ var App = function(){
 				/*7*/'I like birthdays, but like everything else: too much will kill you.',
 				/*8*/'There\'s two types of people in this world. Those who finish their sentences',
 				/*9*/'Woman shouldn\'t have children after 35. Really ... 35 is enough.'
-				][joke]);
+			][joke]);
 			console.log(joke);
 		} else {
 			globals.found = false;
