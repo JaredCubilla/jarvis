@@ -420,9 +420,9 @@ var App = function(){
 				/*2*/'I think my neighbour\'s stalking me because she\'s been Googling my name. I saw it through my telescope last night.',
 				/*3*/'I hate when I\'m about to hug someone really attractive and I hit the mirror.',
 				/*4*/'Apparently, I snore so loudly that it scares everyone in the car I\'m driving.',
-				/*5*/'I used to think that I was indecisive, but now I\'m not sure.',
+				/*5*/'I used to think that I was indecisive, but now I\'m not so sure.',
 				/*6*/'There are three kinds of people in this world. Those who can count and those who can\'t.',
-				/*7*/'I like birthdays, but like everything else: too much will kill you.',
+				/*7*/'I like birthdays, but like most things: too many will kill you.',
 				/*8*/'There\'s two types of people in this world. Those who finish their sentences',
 				/*9*/'Woman shouldn\'t have children after 35. Really ... 35 is enough.'
 			][joke]);
